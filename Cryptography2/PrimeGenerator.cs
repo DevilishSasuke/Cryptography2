@@ -2,41 +2,48 @@
 
 namespace Cryptography
 {
+    // Генератор псевдопростых чисел
     public class PrimeGenerator
     {
-        private readonly Random random = new Random();
-        private BigInteger candidate { get; set; }
+        private readonly Random random = new();
+        private BigInteger Candidate { get; set; }
+
+        // Получить новое простое число
         public BigInteger GeneratePrime()
         {
             int k = 50;
 
             while (true)
             {
-                candidate = randNum();
-                if (candidate == 0) continue;
+                Candidate = RandNum();
+                if (Candidate == 0) continue;
 
-                if (IsLikelyPrime(candidate))
-                    if (RabinMiller(candidate, k))
-                        return candidate;
+                if (IsLikelyPrime(Candidate) && RabinMiller(Candidate, k))
+                    return Candidate;
             }
 
         }
 
-        public BigInteger randNum(int len = 0)
+        // Генерация случайного числа
+        // len - длина битов в числе
+        public BigInteger RandNum(int len = 0)
         {
-            len = len > 0 ? len / 8 : random.Next(100, 130) / 8;
+            len = len > 7 ? len / 8 : random.Next(100, 130) / 8;
             var bytes = new byte[len];
 
             random.NextBytes(bytes);
-            bytes[bytes.Length - 1] &= (byte)0x7F;
+            bytes[^1] &= (byte)0x7F; // Смена знака на положительный
 
             return new BigInteger(bytes);
         }
 
+        // Проверка на простоту поиском чисел-делителей
+        // из решета Эратосфена
         public static bool IsLikelyPrime(BigInteger number)
         {
             var sieve = EratosthenesSieve.GetSieve();
 
+            // Проходим по решету простых чисел
             foreach (var prime in sieve)
             {
                 if (prime >= number)
@@ -48,6 +55,7 @@ namespace Cryptography
             return true;
         }
 
+        // Проверка Рабина Миллера
         public bool RabinMiller(BigInteger number, int steps)
         {
             var b = number - 1;
@@ -58,13 +66,15 @@ namespace Cryptography
             {
                 k++;
                 beta[k] = b % 2;
-                b = b / 2;
+                b /= 2;
             } while (b > 0);
 
+            // Делаем steps попыток обнаружить делители
             for (int j = 0; j < steps; j++)
             {
-                var a = randNum();
-                if (CryptoRSA.EuclidExtended(a, number) > 1)
+                var a = RandNum();
+                // Взаимно простые?
+                if (MyMath.Euclid(a, number) > 1)
                     return false;
                 d = 1;
                 for (int i = k; i >= 0; i--)

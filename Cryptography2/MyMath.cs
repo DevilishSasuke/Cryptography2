@@ -14,7 +14,7 @@ namespace Cryptography
 
                 if (b % 2 == 1)
                     d = (d * c) % n;
-                b = b / 2;
+                b /= 2;
                 c = (c * c) % n;
             }
 
@@ -66,7 +66,7 @@ namespace Cryptography
                 b = rand.GeneratePrime();
                 if (b >= a && b <= 2) continue;
 
-                for (b = b % a; b < a; ++b)
+                for (b %= a; b < a; ++b)
                 {
                     if (Euclid(a, b) == 1)
                         return b;

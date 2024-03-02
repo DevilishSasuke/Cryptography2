@@ -3,12 +3,12 @@
     public static class EratosthenesSieve
     {
         private static int previousN;
-        private static int[] sieve;
+        private static int[] sieve = Array.Empty<int>();
         public static int[] GetSieve(int n = 5000)
         {
             if (n < 1)
                 n = 5000;
-            if (sieve != null && previousN == n)
+            if (sieve.Length > 0 && previousN == n)
                 return sieve;
             previousN = n;
 
