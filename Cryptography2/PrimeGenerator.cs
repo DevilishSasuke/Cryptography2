@@ -51,7 +51,8 @@ namespace Cryptography
             {
                 random.NextBytes(bytes);
                 candidate = new BigInteger(bytes);
-            } while (candidate >= N && candidate <= 0);
+                candidate = BigInteger.Abs(candidate);
+            } while (candidate >= N);
 
             return candidate;
         }
@@ -74,15 +75,14 @@ namespace Cryptography
             return RabinMiller(number);
         }
 
-        public static bool RabinMiller(BigInteger number) => RabinMiller(number, 50);
-
         // Проверка Рабина Миллера
+        public static bool RabinMiller(BigInteger number) => RabinMiller(number, 50);
         public static bool RabinMiller(BigInteger number, int steps)
         {
             var b = number - 1;
             var k = -1;
             BigInteger d, x;
-            BigInteger[] beta = new BigInteger[150];
+            BigInteger[] beta = new BigInteger[300];
             do
             {
                 k++;
