@@ -5,28 +5,31 @@ namespace Cryptography
     // Генератор псевдопростых чисел
     public class PrimeGenerator
     {
-        private readonly Random random = new();
+        private static readonly Random random = new();
         private BigInteger Candidate { get; set; }
 
         // Получить новое простое число
         public BigInteger GeneratePrime()
         {
-            int k = 50;
-
             while (true)
             {
                 Candidate = RandNum();
                 if (Candidate == 0) continue;
 
-                if (IsLikelyPrime(Candidate) && RabinMiller(Candidate, k))
-                    return Candidate;
+                if (IsPrime(Candidate))
+                {
+                    // Проверка простого числа на "надёжность"/"безопасность"
+                    var safePrime = Candidate * 2 + 1;
+                    if (IsPrime(safePrime))
+                       return safePrime;
+                }    
             }
 
         }
 
         // Генерация случайного числа
         // len - длина битов в числе
-        public BigInteger RandNum(int len = 0)
+        public static BigInteger RandNum(int len = 0)
         {
             len = len > 7 ? len / 8 : random.Next(100, 130) / 8;
             var bytes = new byte[len];
@@ -37,9 +40,25 @@ namespace Cryptography
             return new BigInteger(bytes);
         }
 
+        // Генерация случайного BigInteger
+        // в диапазоне [1, N-1] включительно
+        public BigInteger RandNum(BigInteger N)
+        {
+            BigInteger candidate;
+            var bytes = N.ToByteArray();
+
+            do
+            {
+                random.NextBytes(bytes);
+                candidate = new BigInteger(bytes);
+            } while (candidate >= N && candidate <= 0);
+
+            return candidate;
+        }
+
         // Проверка на простоту поиском чисел-делителей
         // из решета Эратосфена
-        public static bool IsLikelyPrime(BigInteger number)
+        public static bool IsPrime(BigInteger number)
         {
             var sieve = EratosthenesSieve.GetSieve();
 
@@ -52,11 +71,13 @@ namespace Cryptography
                     return false;
             }
 
-            return true;
+            return RabinMiller(number);
         }
 
+        public static bool RabinMiller(BigInteger number) => RabinMiller(number, 50);
+
         // Проверка Рабина Миллера
-        public bool RabinMiller(BigInteger number, int steps)
+        public static bool RabinMiller(BigInteger number, int steps)
         {
             var b = number - 1;
             var k = -1;
