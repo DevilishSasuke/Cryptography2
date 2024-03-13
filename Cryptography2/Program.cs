@@ -26,22 +26,22 @@
                     case "1":
                         unit1.GenerateParameters();
                         unit2 = new DeffieHellman(unit1.P, unit1.G);
-                        Console.WriteLine(String.Format("\np: {0}; \ng: {1}; ", unit1.P, unit1.G));
+                        Console.WriteLine($"\np: {unit1.P}; \ng: {unit1.G};");
                         break;
                     case "2":
-                        if (unit1.GeneratePublicKey() && unit2.GeneratePublicKey())
+                        if (unit1.GenerateInstanceKeys() && unit2.GenerateInstanceKeys())
                             Console.WriteLine($"Ключи были сгенерированы: " +
                                 $"\nОткрытые: X: {unit1.PublicKey} \tY: {unit2.PublicKey}" +
-                                $"\nЗакрытые: x: {unit1.OwnKey} \ty: {unit2.OwnKey}");
+                                $"\nЗакрытые: x: {unit1.PrivateKey} \ty: {unit2.PrivateKey}");
                         else
                             Console.WriteLine("\nСначала сгенерируйте p и g.");
                         break;
                     case "3":
-                        if (unit1.CalculatePrivateKey(unit2) && unit2.CalculatePrivateKey(unit1)) 
+                        if (unit1.CalculateGeneralKey(unit2) && unit2.CalculateGeneralKey(unit1)) 
                         {
                             Console.WriteLine($"Общий ключ: (должен быть одинаковым)" +
-                                $"\nПервый: \t{unit1.PrivateKey}" +
-                                $"\nВторой: \t{unit2.PrivateKey}");
+                                $"\nПервый: \t{unit1.GeneralKey}" +
+                                $"\nВторой: \t{unit2.GeneralKey}");
                         }
                         else
                             Console.WriteLine("\nСначала сгенерируйте открытые ключи.");
